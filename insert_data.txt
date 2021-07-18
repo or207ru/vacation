@@ -1,0 +1,42 @@
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://www.masa.co.il/wp-content/uploads/2019/04/open-3.jpg', '2350', '2020-12-20', '2020-12-26', 'Singapur - market traveling');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://static01.tjt.co.il/sites/www.totallyjewishtravel.com/files/tcoreimg/4f14fe4ab6a7977186cbbfd9bab32d09.jpg', '1750', '2021-01-13', '2021-01-19', 'Japan - travel by the sushi');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://www.masa.co.il/wp-content/uploads/2017/11/thailand_open.jpg', '2000', '2020-12-01', '2020-12-13', 'Thailand - massage and cocktail');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://www.state.gov/wp-content/uploads/2018/11/South-Africa-e1555938663342-2501x1406.jpg', '1299', '2020-12-23', '2020-12-28', 'South Africa - shoping and resturants');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://lp-cms-production.imgix.net/2019-06/91532ae17b861be1160a56ab54f28ed4-morocco.jpg',	'2350',	'2020-11-30', '2020-12-06',	'Morroco - authentic tour');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://broganabroad.com/wp-content/uploads/2020/05/Alkmaar-Netherlands.jpg', '1750', '2020-12-01', '2020-12-09', 'Netherland - trip and weed');
+INSERT INTO vacations (img, price, first_day, last_day, description)
+values ('https://static.independent.co.uk/s3fs-public/thumbnails/image/2014/03/25/12/eiffel.jpg', '2470', '2020-11-28', '2020-12-09', 'France - see the Eiffel tower');
+
+INSERT INTO users (name, username, password, role)
+VALUES ("admin",	"admin", "$2b$10$FDhuKV4EokGk.ay3RbLL8OqBKsCn10CJ6K6zgEs9AhIqQKdgpMFXG", "admin");
+INSERT INTO users (name, username, password)
+VALUES ("or", "or", "$2b$10$/B04N1Ch2rxHWzYeZWjPKOL0EE4Bc5V1HxCRBuoS26w8VtJmpoS8O");
+INSERT INTO users (name, username, password)
+VALUES ("neta", "neta", "$2b$10$lRqqLb9iSmXUGWJTtgOHNOO3Jf7VmEjtCb7ZUF0bG0CgoyjHFY9p2");
+INSERT INTO users (name, username, password)
+VALUES ("alon", "alon", "$2b$10$Ot.XcbhjO83UejqRWLyZFu5F.dvX10FTFR9bRdKXZcpSpgKEgki72");
+INSERT INTO users (name, username, password)
+VALUES ("balu", "balu", "$2b$10$pY.2ce1zcbboT8V2HJoueeR98EcfLjrcGLwLndarYCw4LilAxvGYm");
+
+INSERT INTO follow (user_id, vacation_id)
+values (2, 2);
+INSERT INTO follow (user_id, vacation_id)
+values (3, 2);
+INSERT INTO follow (user_id, vacation_id)
+values (4, 2);
+INSERT INTO follow (user_id, vacation_id)
+values (2, 1);
+INSERT INTO follow (user_id, vacation_id)
+values (4, 1);
+INSERT INTO follow (user_id, vacation_id)
+values (4, 3);
+INSERT INTO follow (user_id, vacation_id)
+values (5, 3);
+INSERT INTO follow (user_id, vacation_id)
+values (5, 4);
