@@ -1,0 +1,26 @@
+create database global_vacation;
+use global_vacation;
+
+create table users(
+	id int auto_increment,
+    name varchar(255) not null,
+    username varchar(255) not null,
+    password text not null,
+    role varchar(10) default "user",
+    primary key(id)
+);
+
+create table vacations(
+	id int auto_increment,
+    img varchar(255) not null,
+    price float not null,
+    first_day date not null,
+    last_day date not null,
+    description text default "the best vacation and i'm telling the truth",
+    primary key(id)
+);
+
+create table follow(
+	user_id int not null,
+    vacation_id int not null
+)
