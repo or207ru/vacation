@@ -1,25 +1,34 @@
-import logo from './logo.svg';
-import './App.css';
+///////////////////////////////////////////////////////////
+//
+// Holding the entire components and navigate between them
+//
+///////////////////////////////////////////////////////////
 
-function App() {
+
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Admin from './components/Admin';
+import Edit from './components/Edit';
+import Login from './components/Login';
+import Register from './components/Register';
+import Vacations from './components/Vacations';
+
+const App = () => {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    // possesing the component inside routes
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' exact element={<Login />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/vacations' element={<Vacations />} />
+        <Route path='/admin' element={<Admin />} />
+        <Route path='/edit' element={<Edit />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
+
