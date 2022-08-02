@@ -1,69 +1,94 @@
-import React, { useState, useEffect } from 'react'
+/////////////////////////////////////////////////
+//
+// Managing the vacation displaying and following
+//
+/////////////////////////////////////////////////
+
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
-import { makeStyles } from '@material-ui/core/styles';
-import Badge from '@material-ui/core/Badge';
-import Paper from '@material-ui/core/Paper';
+import { styled } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
+import Badge from '@mui/material/Badge';
+import Paper from '@mui/material/Paper';
 
+// classes for styling
+const PREFIX = 'Vacations';
+const classes = {
+    title: `${PREFIX}-title`,
+    vacationContent: `${PREFIX}-vacationContent`,
+    cardGrid: `${PREFIX}-cardGrid`,
+    card: `${PREFIX}-card`,
+    followed: `${PREFIX}-followed`,
+    cardMedia: `${PREFIX}-cardMedia`,
+    cardContent: `${PREFIX}-cardContent`,
+    footer: `${PREFIX}-footer`,
+    middleline: `${PREFIX}-middleline`,
+    underline: `${PREFIX}-underline`,
+    badge: `${PREFIX}-badge`,
+    action: `${PREFIX}-action`,
+};
 
-const useStyles = makeStyles((theme) => ({
-    title: {
+// defining the style
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.title}`]: {
         flexGrow: 1,
     },
-    vacationContent: {
+    [`& .${classes.vacationContent}`]: {
         backgroundColor: theme.palette.background.paper,
         padding: theme.spacing(15, 0, 2),
     },
-    cardGrid: {
+    [`& .${classes.cardGrid}`]: {
         paddingTop: theme.spacing(8),
         paddingBottom: theme.spacing(8),
     },
-    card: {
+    [`& .${classes.card}`]: {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
     },
-    followed: {
+    [`& .${classes.followed}`]: {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         border: "0.2px rgb(184,134,11) solid",
         backgroundColor: "rgba(255,215,0,0.05)",
     },
-    cardMedia: {
+    [`& .${classes.cardMedia}`]: {
         height: 0,
         paddingTop: '56.25%',
     },
-    cardContent: {
+    [`& .${classes.cardContent}`]: {
         flexGrow: 1,
         alignSelf: 'center',
     },
-    footer: {
+    [`& .${classes.footer}`]: {
         backgroundColor: theme.palette.background.paper,
         padding: theme.spacing(6),
     },
-    middleline: {
+    [`& .${classes.middleline}`]: {
         margin: theme.spacing(2, 0),
         display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'space-evenly'
     },
-    underline: {
+    [`& .${classes.underline}`]: {
         display: 'flex',
         justifyContent: 'space-between'
     },
-    badge: {
+    [`& .${classes.badge}`]: {
         margin: theme.spacing(0, 1),
     },
-    action: {
+    [`& .${classes.action}`]: {
         position: 'absolute',
         textAlign: 'center',
         top: '10%',
@@ -77,40 +102,47 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const Vacations = () => {
 
-const Vacations = ({ history }) => {
+    // usses for navigation and sending data to other routes
+    let navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const classes = useStyles()
-    const dispatch = useDispatch()
-    const user = useSelector(state => state.user)
-    const vacations = useSelector(state => state.vacations)
-    const [actionFollow, setActionFollow] = useState("")
+    // setting redux dispatching
+    const user = useSelector(state => state.user);
+    const vacations = useSelector(state => state.vacations);
 
+    // seting the initial values for the component
+    const [actionFollow, setActionFollow] = useState("");
 
+    // requesting the vacations from the server
     const getVacations = async () => {
-        if (!localStorage.token || !user.password) return history.push('/')
+        if (!localStorage.token || !user.password) return navigate('/', { replace: false });
         const res = await fetch('http://localhost:1000/api/vacations', {
             method: "get",
             headers: { 'token': localStorage.token }
-        })
+        });
         dispatch({
             type: "GETIN",
             payload: await res.json()
-        })
-    }
+        });
+    };
 
+    // invoking vacation request from the server in case of change in some vacation
     useEffect(() => {
-        getVacations()
-    }, [actionFollow])
+        getVacations();
+    }, [actionFollow]);
 
+    // logout by removing the token and redirecting to the login page
     const logout = () => {
-        localStorage.clear()
+        localStorage.clear();
         dispatch({
             type: "LOGOUT"
-        })
-        history.push('/')
-    }
+        });
+        navigate('/', { replace: false });
+    };
 
+    // sending request to the server to update follo/unfollow for specific vacation
     const handleFollow = async (id, turnOff) => {
         try {
             const res = await fetch('http://localhost:1000/api/vacations/follow', {
@@ -120,23 +152,23 @@ const Vacations = ({ history }) => {
                     'token': localStorage.token
                 },
                 body: JSON.stringify({ vacation_id: id })
-            })
-            const vn = `vacation number ${id}`
-            setActionFollow(turnOff ? `Unfollowed ${vn}` : `Followed ${vn}`)
+            });
+            const vn = `vacation number ${id}`;
+            setActionFollow(turnOff ? `Unfollowed ${vn}` : `Followed ${vn}`);
             setTimeout(() => {
-                setActionFollow("")
+                setActionFollow("");
             }, 2750);
         }
         catch (err) {
-            console.log(err)
-            setActionFollow("sorry there is no server")
+            setActionFollow("sorry there is no server");
         }
-    }
+    };
 
-
-
+    // displaying all of the vacation
+    // main sorting by the one which followed by the user
+    // and secondary sorting according to the number of followers
     return (
-        <div>
+        <Root>
             <AppBar position="fixed">
                 <Toolbar>
                     <Typography variant="h5" className={classes.title}>Wellcom {user.name}</Typography>
@@ -160,8 +192,8 @@ const Vacations = ({ history }) => {
                 <Container className={classes.cardGrid} maxWidth="md">
                     <Grid container spacing={4}>
                         {vacations.map((card) => (
-                            <Grid item key={card} xs={12} sm={6} md={4}>
-                                <Card className={classes.card, card.do_i_follow ? classes.followed : classes.card}>
+                            <Grid item key={card.id} xs={12} sm={6} md={4}>
+                                <Card className={`${classes.card} ${card.do_i_follow ? classes.followed : classes.card}`}>
                                     <CardMedia className={classes.cardMedia}
                                         image={card.img}
                                         title="Image title"
@@ -173,6 +205,7 @@ const Vacations = ({ history }) => {
                                         <Typography>
                                             {card.description}
                                         </Typography>
+                                        <br />
                                         <span className={classes.middleline}>
                                             <Typography>
                                                 from: {card.first_day}
@@ -202,9 +235,8 @@ const Vacations = ({ history }) => {
                     Hope you enjoied!
                 </Typography>
             </footer>
-        </div>
-    )
-}
+        </Root>
+    );
+};
 
 export default Vacations;
-
