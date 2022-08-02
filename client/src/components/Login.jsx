@@ -1,18 +1,36 @@
+////////////////////////////////////////////////////
+//
+// Managing the login mechanizem
+// redirecting to 'register' 'user-page' admin-page'
+//
+////////////////////////////////////////////////////
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
 import jwt_decode from 'jwt-decode';
-import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { styled } from '@mui/material/styles';
+import Avatar from '@mui/material/Avatar';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import Paper from '@mui/material/Paper';
 
+// classes for styling
+const PREFIX = 'Login';
+const classes = {
+    headline: `${PREFIX}-headline`,
+    paper: `${PREFIX}-paper`,
+    avatar: `${PREFIX}-avatar`,
+    form: `${PREFIX}-form`,
+    submit: `${PREFIX}-submit`,
+    err: `${PREFIX}-err`,
+};
 
-const useStyles = makeStyles((theme) => ({
-    headline: {
+// defining the style
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.headline}`]: {
         margin: 'auto',
         marginTop: theme.spacing(1),
         display: 'flex',
@@ -21,77 +39,79 @@ const useStyles = makeStyles((theme) => ({
         width: '95%',
         height: '15vh',
     },
-    paper: {
+    [`& .${classes.paper}`]: {
         marginTop: theme.spacing(5),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
     },
-    avatar: {
+    [`& .${classes.avatar}`]: {
         margin: theme.spacing(1),
         backgroundColor: theme.palette.secondary.main,
     },
-    form: {
+    [`& .${classes.form}`]: {
         width: '100%',
         marginTop: theme.spacing(1),
     },
-    submit: {
+    [`& .${classes.submit}`]: {
         margin: theme.spacing(2, 0, 2),
     },
-    err: {
+    [`& .${classes.err}`]: {
         textAlign: 'center',
         backgroundColor: "rgba(220,0,50,0.5)",
         marginTop: theme.spacing(3),
         fontWeight: "bold",
     },
-}))
+}));
 
+const Login = () => {
 
+    // usses for navigation and sending data to other routes
+    let navigate = useNavigate();
 
-const Login = ({ history }) => {
+    // setting redux dispatching
+    const dispatch = useDispatch();
 
-    const classes = useStyles()
-    const dispatch = useDispatch()
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
-    const [errMsg, setErrMgs] = useState("")
+    // seting the initial values for the component
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [errMsg, setErrMgs] = useState("");
 
-
+    // checking the login detail with the server and navigate accordingly
     const handleSubmit = async () => {
         try {
             const res = await fetch('http://localhost:1000/api/users/login', {
                 method: 'post',
                 headers: { "Content-type": "application/json" },
                 body: JSON.stringify({ username, password })
-            })
-            const data = await res.json()
+            });
+            const data = await res.json();
             if (data.err) {
-                setErrMgs(data.msg)
+                setErrMgs(data.msg);
                 setTimeout(() => {
-                    setErrMgs("")
-                }, 1500)
+                    setErrMgs("");
+                }, 1500);
             } else {
-                localStorage.token = data.token
-                const decoded = await jwt_decode(data.token)
+                localStorage.token = data.token;
+                const decoded = await jwt_decode(data.token);
                 dispatch({
                     type: "LOGIN",
                     payload: decoded
-                })
-                decoded.role === "user" ? history.push('./vacations') : history.push('./admin')
+                });
+                decoded.role === "user" ? navigate('../vacations') : navigate('../admin');
             }
 
         } catch (err) {
-            setErrMgs("sorry, server issu")
+            setErrMgs("sorry, server issu");
             setTimeout(() => {
-                setErrMgs("")
-            }, 1500)
+                setErrMgs("");
+            }, 1500);
         }
-    }
+    };
 
-
-
+    // displaying the field of login and leting the option for switching to registration
     return (
-        <div>
+        <Root>
             <Paper className={classes.headline} elevation={3}>
                 <Typography variant="h4">
                     Wellcome to Rubin-Tours
@@ -103,7 +123,7 @@ const Login = ({ history }) => {
                     </Avatar>
                     <Typography component="h1" variant="h5">
                         Login</Typography>
-                    <form className={classes.form} autocomplete="off">
+                    <form className={classes.form} autoComplete="off">
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -138,8 +158,8 @@ const Login = ({ history }) => {
                     </form>
                 </div>
             </Container>
-        </div>
+        </Root>
     );
-}
+};
 
 export default Login;
