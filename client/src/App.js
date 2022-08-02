@@ -1,5 +1,12 @@
-import React from 'react';
-import { BrowserRouter, Route } from 'react-router-dom';
+///////////////////////////////////////////////////////////
+//
+// Holding the entire components and navigate between them
+//
+///////////////////////////////////////////////////////////
+
+
+import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Admin from './components/Admin';
 import Edit from './components/Edit';
 import Login from './components/Login';
@@ -9,17 +16,19 @@ import Vacations from './components/Vacations';
 const App = () => {
 
   return (
-    <div>
-      <BrowserRouter>
-        <Route path='/login' component={Login} />
-        <Route path='/register' component={Register} />
-        <Route path='/vacations' component={Vacations} />
-        <Route path='/admin' component={Admin} />
-        <Route path='/edit' component={Edit} />
-        <Route path='/' exact component={Login} />
-      </BrowserRouter>
-    </div >
-  )
-}
+    // possesing the component inside routes
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' exact element={<Login />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+        <Route path='/vacations' element={<Vacations />} />
+        <Route path='/admin' element={<Admin />} />
+        <Route path='/edit' element={<Edit />} />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;
+
