@@ -1,90 +1,124 @@
-import React, { useState, useEffect } from 'react'
+///////////////////////////////////////////
+//
+// Holding the admin screenss and utilities
+//
+///////////////////////////////////////////
+
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
-import Grid from '@material-ui/core/Grid';
-import Container from '@material-ui/core/Container';
-import { makeStyles } from '@material-ui/core/styles';
-import Badge from '@material-ui/core/Badge';
-import Paper from '@material-ui/core/Paper';
-import Avatar from '@material-ui/core/Avatar';
-import ImageIcon from '@material-ui/icons/Image';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
-import MessageIcon from '@material-ui/icons/Message';
-import DateRangeIcon from '@material-ui/icons/DateRange';
-import AddIcon from '@material-ui/icons/Add';
-import ClearIcon from '@material-ui/icons/Clear';
-import { green } from '@material-ui/core/colors';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import TextField from '@material-ui/core/TextField';
-import Fab from '@material-ui/core/Fab';
-import Chart from 'chart.js';
+import { Chart, BarController, BarElement, PointElement, LinearScale, Title, CategoryScale } from 'chart.js';
+import { styled } from '@mui/material/styles';
+import { useNavigate } from "react-router-dom";
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
+import Badge from '@mui/material/Badge';
+import Paper from '@mui/material/Paper';
+import Avatar from '@mui/material/Avatar';
+import { green } from '@mui/material/colors';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import TextField from '@mui/material/TextField';
+import Fab from '@mui/material/Fab';
+import ImageIcon from '@mui/icons-material/Image';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import MessageIcon from '@mui/icons-material/Message';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import AddIcon from '@mui/icons-material/Add';
+import ClearIcon from '@mui/icons-material/Clear';
 
-const SHOW_ALL = 0
-const ADD_NEW = 1
-const REPORT = 2
+// inner screen
+const SHOW_ALL = 0;
+const ADD_NEW = 1;
+const REPORT = 2;
+let myChart;
 
-const useStyles = makeStyles((theme) => ({
-    toolbar: {
+// classes for styling
+const PREFIX = 'Admin';
+const classes = {
+    toolbar: `${PREFIX}-toolbar`,
+    title: `${PREFIX}-title`,
+    vacationContent: `${PREFIX}-vacationContent`,
+    cardGrid: `${PREFIX}-cardGrid`,
+    card: `${PREFIX}-card`,
+    followed: `${PREFIX}-followed`,
+    cardContent: `${PREFIX}-cardContent`,
+    cardMedia: `${PREFIX}-cardMedia`,
+    middleline: `${PREFIX}-middleline`,
+    underline: `${PREFIX}-underline`,
+    badge: `${PREFIX}-badge`,
+    action: `${PREFIX}-action`,
+    footer: `${PREFIX}-footer`,
+    err: `${PREFIX}-err`,
+    avatar: `${PREFIX}-avatar`,
+    formRow: `${PREFIX}-formRow`,
+    form: `${PREFIX}-form`,
+    wrap: `${PREFIX}-wrap`,
+    clickAble: `${PREFIX}-clickAble`,
+};
+
+// defining the style
+const Root = styled('div')(({ theme }) => ({
+    [`& .${classes.toolbar}`]: {
         borderBottom: "3px solid red",
     },
-    title: {
+    [`& .${classes.title}`]: {
         flexGrow: 1,
     },
-    vacationContent: {
+    [`& .${classes.vacationContent}`]: {
         backgroundColor: theme.palette.background.paper,
         padding: theme.spacing(15, 0, 2),
     },
-    cardGrid: {
+    [`& .${classes.cardGrid}`]: {
         paddingTop: theme.spacing(8),
         paddingBottom: theme.spacing(8),
     },
-    card: {
+    [`& .${classes.card}`]: {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
     },
-    followed: {
+    [`& .${classes.followed}`]: {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         border: "0.2px rgb(184,134,11) solid",
         backgroundColor: "rgba(255,215,0,0.05)",
     },
-    cardMedia: {
+    [`& .${classes.cardMedia}`]: {
         height: 0,
         paddingTop: '56.25%',
     },
-    cardContent: {
+    [`& .${classes.cardContent}`]: {
         flexGrow: 1,
         alignSelf: 'center',
     },
-    footer: {
+    [`& .${classes.footer}`]: {
         backgroundColor: theme.palette.background.paper,
         padding: theme.spacing(6),
     },
-    middleline: {
+    [`& .${classes.middleline}`]: {
         margin: theme.spacing(2, 0),
-        display: 'flex',
-        justifyContent: 'space-evenly'
+        // display: 'flex',
+        // justifyContent: 'space-evenly'
     },
-    underline: {
+    [`& .${classes.underline}`]: {
         display: 'flex',
         justifyContent: 'space-around'
     },
-    badge: {
+    [`& .${classes.badge}`]: {
         margin: theme.spacing(0, 1),
     },
-    action: {
+    [`& .${classes.action}`]: {
         position: 'absolute',
         textAlign: 'center',
         top: '10%',
@@ -96,7 +130,29 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(3),
         fontWeight: 'bold',
     },
-    clickAble: {
+    [`& .${classes.wrap}`]: {
+        margin: '6vh 0 1vh 0',
+        padding: '12px',
+    },
+    [`& .${classes.form}`]: {
+        width: '100%',
+        marginTop: theme.spacing(1),
+    },
+    [`& .${classes.formRow}`]: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around'
+    },
+    [`& .${classes.avatar}`]: {
+        marginRight: '6px',
+    },
+    [`& .${classes.err}`]: {
+        textAlign: 'center',
+        backgroundColor: "rgba(220,0,50,0.5)",
+        marginTop: theme.spacing(3),
+        fontWeight: "bold",
+    },
+    [`& .${classes.clickAble}`]: {
         cursor: 'pointer',
         margin: '0 10px 1px 0px',
         '&:hover': {
@@ -105,85 +161,70 @@ const useStyles = makeStyles((theme) => ({
             marginBottom: '0px',
         },
     },
-    wrap: {
-        margin: '6vh 0 1vh 0',
-        padding: '12px',
-    },
-    form: {
-        width: '100%',
-        marginTop: theme.spacing(1),
-    },
-    formRow: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around'
-    },
-    avatar: {
-        marginRight: '6px',
-    },
-    err: {
-        textAlign: 'center',
-        backgroundColor: "rgba(220,0,50,0.5)",
-        marginTop: theme.spacing(3),
-        fontWeight: "bold",
-    },
 }));
 
+// main function for admin control
+const Admin = () => {
 
-const Admin = ({ history }) => {
+    // usses for navigation and sending data to other routes
+    let navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const classes = useStyles();
-    const dispatch = useDispatch()
-    const user = useSelector(state => state.user)
-    const vacations = useSelector(state => state.vacations)
-    const [actionFollow, setActionFollow] = useState("")
-    const [screen, setScreen] = useState(0)
-    const [errMsg, setErrMgs] = useState("")
-    const [image, setImage] = useState("")
-    const [price, setPrice] = useState("")
-    const [description, setDescription] = useState("")
-    const [startAt, setStartAt] = useState("")
-    const [endAt, setEndAt] = useState("")
-    const [chartOn, setChartOn] = useState(true)
+    // retrieving data from redux
+    const user = useSelector(state => state.user);
+    const vacations = useSelector(state => state.vacations);
 
+    // seting tHE initial values for the component
+    const [actionFollow, setActionFollow] = useState("");
+    const [screen, setScreen] = useState(0);
+    const [errMsg, setErrMgs] = useState("");
+    const [image, setImage] = useState("");
+    const [price, setPrice] = useState("");
+    const [description, setDescription] = useState("");
+    const [startAt, setStartAt] = useState("");
+    const [endAt, setEndAt] = useState("");
+    const [chartOn, setChartOn] = useState(true);
 
-
+    // swiching by frames and turning on the chart copntent
     const handleNavChange = (e, newScreen) => {
-        setChartOn(newScreen === REPORT)
+        setChartOn(newScreen === REPORT);
         setScreen(newScreen);
-    }
+    };
 
+    // fetching the vacations from the server
     const getVacations = async () => {
-        if (!localStorage.token || !user.password) return history.push('/')
+        if (!localStorage.token || !user.password) return navigate('/', { replace: false });
         try {
             const res = await fetch('http://localhost:1000/api/vacations', {
                 method: "get",
                 headers: { 'token': localStorage.token }
-            })
+            });
             dispatch({
                 type: "GETIN",
                 payload: await res.json()
-            })
+            });
         } catch (err) {
-            console.log(err)
+            console.log(err);
         }
-    }
+    };
 
+    // invoking the vacations fetching in case of changes in vacation content or refetching
     useEffect(() => {
-        getVacations()
-    }, [actionFollow, errMsg, chartOn])
+        getVacations();
+    }, [actionFollow, errMsg]);
 
-
+    // removing the token and navigate out of admin page
     const logout = () => {
-        localStorage.clear()
+        localStorage.clear();
         dispatch({
             type: "LOGOUT"
-        })
-        history.push('/')
-    }
+        });
+        navigate('/', { replace: false });
+    };
 
+    // sending request for deleting vacation
     const handleDelete = async (id) => {
-        setActionFollow(`Vacation ${id} deleted`)
+        setActionFollow(`Vacation ${id} deleted`);
         try {
             const res = await fetch('http://localhost:1000/api/vacations/update', {
                 method: 'delete',
@@ -192,16 +233,17 @@ const Admin = ({ history }) => {
                     'token': localStorage.token
                 },
                 body: JSON.stringify({ id })
-            })
+            });
             setTimeout(() => {
-                setActionFollow("")
+                setActionFollow("");
             }, 2750);
         }
         catch (err) {
-            console.log(err)
+            console.log(err);
         }
-    }
+    };
 
+    // sending request for adding vacation
     const addVac = async () => {
         if (image && description && price && startAt && endAt) {
             try {
@@ -218,42 +260,44 @@ const Admin = ({ history }) => {
                         last_day: endAt,
                         description
                     })
-                })
-                setErrMgs("*** DONE ***")
+                });
+                setErrMgs("*** DONE ***");
                 setTimeout(() => {
-                    setErrMgs("")
-                }, 2000)
-                clearField()
+                    setErrMgs("");
+                }, 2000);
+                clearField();
             } catch (err) {
-                setErrMgs("sorry, server issu")
+                setErrMgs("sorry, server issu");
                 setTimeout(() => {
-                    setErrMgs("")
-                }, 2000)
+                    setErrMgs("");
+                }, 2000);
             }
         } else {
-            setErrMgs("You must fill all fields")
+            setErrMgs("You must fill all fields");
             setTimeout(() => {
-                setErrMgs("")
-            }, 2200)
+                setErrMgs("");
+            }, 2200);
         }
-    }
+    };
 
+    // clearing the form fields
     const clearField = async () => {
-        document.getElementById("vacation-form").reset()
-        setImage("")
-        setPrice("")
-        setDescription("")
-        setStartAt("")
-        setEndAt("")
-    }
+        document.getElementById("vacation-form").reset();
+        setImage("");
+        setPrice("");
+        setDescription("");
+        setStartAt("");
+        setEndAt("");
+    };
 
+    // returning the main screen for showing the vacations
     const showAll = () => {
         return (
             <Container className={classes.cardGrid} maxWidth="md">
                 <Grid container spacing={4}>
                     {vacations.map((card) => (
-                        <Grid item key={card} xs={12} sm={6} md={4}>
-                            <Card className={classes.card, card.do_i_follow ? classes.followed : classes.card}>
+                        <Grid item key={card.id} xs={12} sm={6} md={4}>
+                            <Card className={`${classes.card} ${card.do_i_follow ? classes.followed : classes.card}`}>
                                 <CardMedia className={classes.cardMedia}
                                     image={card.img}
                                     title="Image title"
@@ -261,11 +305,12 @@ const Admin = ({ history }) => {
                                 <CardContent className={classes.cardContent}>
                                     <Typography gutterBottom variant="h5" component="h2">
                                         price: {card.price}$
-                                        </Typography>
+                                    </Typography>
                                     <Typography>
                                         {card.description}
                                     </Typography>
                                     <span className={classes.middleline}>
+                                        <br />
                                         <Typography>
                                             from: {card.first_day}
                                         </Typography>
@@ -277,16 +322,18 @@ const Admin = ({ history }) => {
                                 <CardActions className={classes.underline}>
                                     <span>
                                         <DeleteOutlineIcon className={classes.clickAble} onClick={() => handleDelete(card.id)} color="secondary" fontSize="medium" />
-                                        <EditOutlinedIcon className={classes.clickAble} onClick={() => history.push({
-                                            pathname: './edit', state: {
-                                                id: card.id,
-                                                img: card.img,
-                                                price: card.price,
-                                                description: card.description,
-                                                start: card.first_day,
-                                                end: card.last_day
-                                            }
-                                        })} style={{ color: green[500] }} fontSize="medium" />
+                                        <EditOutlinedIcon className={classes.clickAble} onClick={() => navigate(
+                                            '/edit',
+                                            {
+                                                state: {
+                                                    id: card.id,
+                                                    img: card.img,
+                                                    price: card.price,
+                                                    description: card.description,
+                                                    start: card.first_day,
+                                                    end: card.last_day
+                                                }
+                                            })} style={{ color: green[500] }} fontSize="medium" />
                                     </span>
                                     < Badge badgeContent={card.followed} className={classes.badge} color="primary">
                                         <Typography>followers</Typography>
@@ -297,9 +344,10 @@ const Admin = ({ history }) => {
                     ))}
                 </Grid>
             </Container>
-        )
-    }
+        );
+    };
 
+    // returning the screen adding new vacations
     const addNew = () => {
         return (
             <span>
@@ -307,7 +355,7 @@ const Admin = ({ history }) => {
                 <Container component="main" maxWidth="xs">
                     <Paper elevation={6} className={classes.wrap}>
                         <div className={classes.paper}>
-                            <form id="vacation-form" className={classes.form} autocomplete="off">
+                            <form id="vacation-form" className={classes.form} autoComplete="off">
                                 <span className={classes.formRow}>
                                     <Avatar className={classes.avatar}>
                                         <ImageIcon />
@@ -396,29 +444,37 @@ const Admin = ({ history }) => {
                     </Paper>
                 </Container>
             </span>
-        )
-    }
+        );
+    };
 
+    // prepering the chart of followed vacations
     const report = () => {
-        let c = document.getElementById("myChart")
-        let ctx = c.getContext("2d")
-        const vac_id = []
-        const vac_followers = []
+
+        // cleaning the canvas for redrawing it
+        if (myChart !== undefined) {
+            myChart.destroy();
+        }
+
+        // setting the chart data
+        let ctx = document.getElementById('myChart').getContext('2d');
+        Chart.register(BarController, BarElement, PointElement, LinearScale, Title, CategoryScale);
+        const vac_id = [];
+        const vac_followers = [];
         for (const v of Object(vacations)) {
             if (v.followed) {
-                vac_id.push(v.id)
-                vac_followers.push(v.followed)
+                vac_id.push(v.id);
+                vac_followers.push(v.followed);
             }
         }
-        console.log(vac_id)
-        console.log(vac_followers)
-        new Chart(ctx, {
+
+        // shaping the chart on the canvas
+        myChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: vac_id,
                 datasets: [{
-                    label: 'for followers',
                     data: vac_followers,
+                    label: "Total",
                     backgroundColor: 'rgba(54, 162, 235, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
@@ -426,27 +482,43 @@ const Admin = ({ history }) => {
             },
             options: {
                 scales: {
-                    yAxes: [{
+                    x: {
+                        title: {
+                            display: true,
+                            text: "vacation id"
+                        },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "followers"
+                        },
                         ticks: {
-                            beginAtZero: true
+                            stepSize: 1
                         }
-                    }]
+                    }
                 }
             }
         });
-    }
+    };
 
+    // setting the data of the screen in case of swiching
+    useEffect(() => {
+        switchFrame(screen);
+    }, [screen]);
+
+    // returning the screen to be showed
     const switchFrame = (frame) => {
         switch (frame) {
-            case SHOW_ALL: return showAll()
-            case ADD_NEW: return addNew()
-            case REPORT: return report()
+            case SHOW_ALL: return showAll();
+            case ADD_NEW: return addNew();
+            case REPORT: return report();
         }
-    }
+    };
 
-
+    // אhe raw page that stores the navigation and subpages
     return (
-        <div>
+        <Root>
             <AppBar position="fixed">
                 <Toolbar className={classes.toolbar}>
                     <Typography variant="h5" className={classes.title}>Ohhhh mighty <b>{user.name}</b></Typography>
@@ -455,6 +527,7 @@ const Admin = ({ history }) => {
                 </Toolbar>
             </AppBar>
 
+            {/* navigation and presenting the current route */}
             <main>
                 <div className={classes.vacationContent}>
                     <Container maxWidth="sm">
@@ -474,6 +547,7 @@ const Admin = ({ history }) => {
                 </div>
 
                 {switchFrame(screen)}
+
                 <Container maxWidth="sm">
                     <canvas style={{ display: `${chartOn ? "block" : "none"}` }} id="myChart" width="400" height="300"></canvas>
                 </Container>
@@ -484,9 +558,8 @@ const Admin = ({ history }) => {
                     You are the best admin!
                 </Typography>
             </footer>
-        </div>
-    )
-}
+        </Root>
+    );
+};
 
 export default Admin;
-
